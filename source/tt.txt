@@ -1,0 +1,11 @@
+select * from student where 'gender'='F'
+select * from student where 'enrollment_no'='mit2018008'
+select * from student where 'email'='mit2018075@iiita.ac.in'
+select * from student where 'course_code'='MIT'
+select * from student where 'name'='Diksha Khas'
+select * from student where 'name'='LOL'
+select * from student where 'gender'='M'
+select * from student
+exit
+exit
+exit
