@@ -83,25 +83,20 @@ void write_file(struct bTree *ptr_tree, struct node *p, int pos, int mod)
 	if (pos == -1) {
 		pos = ptr_tree->next_pos++;
 	}
+
 	FILE *fp = NULL;
-	if (mod == 0) {
-		// printf("file opened in W mode\n");
-		fp = fopen(file_name, "w");
-	} else {
-		fp = fopen(file_name, "r+");
-	}
+
+	fp = (mod == 0) ? fopen(file_name, "w") : fopen(file_name, "r+");
+	
 	if (fp == NULL) {
 		printf("failed to open file\n");
 
 		return;
 	}
 	// printf("node is being stored at %ld\n", pos * sizeof(struct node));
+
 	fseek(fp, pos *sizeof(struct node), 0);
-	fwrite(p, sizeof(struct node), 1, fp);
-	// if(fwrite != 0)  
-	// printf("contents to file written successfully !\n"); 
- 	// else 
-	// printf("error writing file !\n"); 
+	fwrite(p, sizeof(struct node), 1, fp); 
 	fclose(fp);
 }
 
@@ -158,9 +153,8 @@ void insert_non_full(struct bTree *tree, struct node *node, struct student *reco
 		node->key_count++;
 		write_file(tree, node, node->location_in_disk, 1);  
 	} else {
-		while ( i >= 0 && (strcmp(node->students[i].enrollment_no, record->enrollment_no) > 0)) {
+		while (i >= 0 && (strcmp(node->students[i].enrollment_no, record->enrollment_no) > 0)) {
 			i--;
-			printf("%d", i);
 		}
 		struct node *c_i = ALLOC(struct node);
 		        
@@ -258,7 +252,7 @@ void update_helper_pk(struct bTree *tree, char *ar, struct node *root, char upda
 		strcmp(update_column, "name") == 0 ? strcpy(root->students[i].name, update_key) :
 		strcmp(update_column, "email") == 0 ? strcpy(root->students[i].email, update_key) :
 		strcmp(update_column, "course_code") == 0 ? strcpy(root->students[i].course_code, update_key) : strcpy(root->students[i].gender, update_key);
-        printf("updated\n");
+        // printf("updated\n");
         write_file(tree, root, root->location_in_disk, 1);
         
         return;
@@ -492,7 +486,7 @@ void select_statement(struct bTree *bt, char column_name[], char column_key[], i
 	// printf(UL "%10s%2s%11s%5s%10s%17s%10s%4s%10s\n" RESET, column_1, ar, column_2, ar, column_3, ar, column_4, ar, column_5);
 	printf(UL IT "%20s%10s%20s%10s%20s%12s%20s%10s%5s   %s\n" RESET, column_1, ar, column_2, ar, column_3, ar, column_4, ar, column_5,ar);
 	if (mode == 0) {
-	traverse(bt, bt->root);
+		traverse(bt, bt->root);
 	} else {
 		if (strcmp(column_name,"enrollment_no") == 0) {
 			nod = search(bt, column_key);
@@ -503,7 +497,6 @@ void select_statement(struct bTree *bt, char column_name[], char column_key[], i
 				printf(IT "%20s%10s%20s%10s%20s%10s%20s%10s%5s    %s\n" RESET, nod->enrollment_no, ar, nod->name, ar, nod->email, ar, nod->course_code, ar, nod->gender, ar);
 			}
 		} else {
-
 			traverse_where(bt, bt->root, column_name, column_key);
 		}
 	}
@@ -539,6 +532,7 @@ int main()
 		read_string(str);
 		// printf("%s\n",str);
 		switch (str[0]) {
+
 			case 'i' : {
 							strcpy(token, str);
 							check = strtok(token, "(,)");
@@ -547,15 +541,19 @@ int main()
 								temp = intialize_student(str);
 	 							insert(bt, temp);
 								temp = NULL;
-								printf( GRN "1 Row inserted successfully\n" RESET);
+								printf(GRN "1 Row inserted successfully\n" RESET);
  						    	// traverse(bt, bt->root);	
 							} else {
 									printf(RED "\nERROR %d : Primary key violated\n", rand() % 100000);
 								}
 							}
 							break;
+
+
 			case 'e' : 		exit_database(bt);
 							break;
+
+
 			case 'u' : {
 							int rows_updated = 0;
 							strcpy(token, str);
@@ -571,52 +569,49 @@ int main()
 							char search_key[100];
 							if (check != NULL) {
 								strcpy(update_column, check);
-								check = strtok(NULL,"=''");
+								check = strtok(NULL, "=''");
 							}
 							if (check != NULL) {
 								strcpy(update_key, check);
-									check = strtok(NULL,"=''");
+									check = strtok(NULL, "=''");
 							}
 							if (check != NULL) {
 								check = strtok(NULL, "=''");
 							}
 							if (check != NULL) {
 								strcpy(column_name, check);
-								check = strtok(NULL,"=''");
+								check = strtok(NULL, "=''");
 							}
 							if (check != NULL) {
 								strcpy(search_key, check);
-								check = strtok(NULL,"=''");
+								check = strtok(NULL, "=''");
 							}
 							if (strcmp(column_name,"enrollment_no") == 0) {
 								update_pk(bt, search_key, update_column, update_key);
 								printf(GRN "1 row updated\n" RESET);
 							} else {
 								update(bt, bt->root, column_name, update_column, search_key, update_key, &rows_updated);
-								printf(GRN "%d rows updated\n" RESET,rows_updated);
+								printf(GRN "%d rows updated\n" RESET, rows_updated);
 							}
 						}
-							break;
-				case 's' : {
+						break;
+			case 's' : {
 							char column_name1[100];
 							char column_key1[100];
-							
-							if(strlen(str)>30)
-							{
+							if(strlen(str) > 30) {
 								mode = 1;
 								check = strtok(str, "=''");
 								check = strtok(NULL, "=''");
 								if (check != NULL) {
 									strcpy(column_name1, check);
-									check = strtok(NULL,"=''");
+									check = strtok(NULL, "=''");
 								}
 								if (check != NULL) {
 									strcpy(column_key1, check);
-									check = strtok(NULL,"=''");
-								}
-
+									check = strtok(NULL, "=''");
+								} 
 							} else {
-								mode =0 ;
+								mode = 0;
 							}
 
 							if (bt->next_pos != 0) {
@@ -624,9 +619,11 @@ int main()
 							} else {
 								printf(RED "No data found\n");
 							}
-						}
-							break;
-				default : break;
+						}	
+						break;
+
+
+			default : break;
 			}
 		}
 	
